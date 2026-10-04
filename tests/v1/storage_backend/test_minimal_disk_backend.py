@@ -47,7 +47,7 @@ def _setup_backend(tmp_dir: str):
 
     allocator = PagedCpuGpuMemoryAllocator()
     allocator.init_cpu_memory_allocator(
-        size_in_bytes=100 * 1024 * 1024,
+        size=29360128 * 4, # align bytes 29360128 * 4
         shapes=[shape],
         dtypes=[dtype],
         fmt=MemoryFormat.KV_2LTD,
