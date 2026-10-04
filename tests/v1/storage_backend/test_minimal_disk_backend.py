@@ -90,6 +90,9 @@ def test_minimal_disk_backend_put_get():
         assert not backend.contains(key)
         assert backend.get(key) is None
 
+        # Direct backend calls bypass StorageManager's reference cleanup.
+        mem_obj.ref_count_down()
+        loaded_obj.ref_count_down()
         local_cpu.get_memory_allocator().close()
 
 
@@ -124,6 +127,10 @@ def test_minimal_disk_backend_batched():
         assert backend.batched_remove(keys) == len(keys)
         assert backend.batched_contains(keys) == 0
 
+        # Direct backend calls bypass StorageManager's reference cleanup.
+        for obj in [*mem_objs, *loaded_objs]:
+            if obj is not None:
+                obj.ref_count_down()
         local_cpu.get_memory_allocator().close()
 
 
@@ -155,6 +162,9 @@ def run_demo() -> None:
         assert torch.equal(mem_obj.tensor, loaded_obj.tensor)
         print("   SUCCESS: Loaded KV cache matches original random tensor!")
 
+        # Direct backend calls bypass StorageManager's reference cleanup.
+        mem_obj.ref_count_down()
+        loaded_obj.ref_count_down()
         local_cpu.get_memory_allocator().close()
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
